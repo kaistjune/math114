@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Latin+Modern+Math&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; background:#e8e0f0; }
+
+  .frame {
+    width:100vw; height:56.25vw;
+    max-height:100vh; max-width:177.78vh;
+    margin:auto; position:absolute; top:0;bottom:0;left:0;right:0;
+    background:#f3eff8;
+    display:grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: auto 1fr auto;
+    font-family:'Noto Sans KR', sans-serif;
+    color:#2a2035;
+    padding: 0.3vw 0.45vw 0.15vw;
+  }
+
+  .hdr {
+    grid-column:1/-1;
+    border-bottom:2px solid #d0c8dc;
+    padding-bottom:0.12vw; margin-bottom:0.1vw;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .hdr h1 { font-size:1.2vw; font-weight:900; color:#1a1028; }
+  .hdr .sub { font-size:0.62vw; color:#6a5a7a; }
+
+  .m { font-family:'Latin Modern Math','Times New Roman',serif; font-style:italic; }
+  .m.il { font-size:1.2em; }
+  .frac { display:inline-flex; flex-direction:column; align-items:center; vertical-align:middle; line-height:1.05; }
+  .frac .num { border-bottom:1.5px solid currentColor; padding:0 0.12em 0.03em; }
+  .frac .den { padding:0.03em 0.12em 0; }
+  sup { font-size:0.7em; vertical-align:super; }
+
+  .left {
+    grid-column:1; grid-row:2;
+    padding-right:0.15vw;
+    display:flex; flex-direction:column;
+  }
+  .left svg { width:100%; flex:1; }
+
+  .right {
+    grid-column:2; grid-row:2;
+    padding-left:0.3vw; border-left:2px solid #d0c8dc;
+    display:flex; flex-direction:column; gap:0.12vw;
+    overflow:hidden;
+  }
+
+  .kb {
+    background:#ebe5f2;
+    border:1.5px solid #c0b4d0;
+    border-radius:0.2vw;
+    padding:0.2vw 0.2vw;
+    text-align:center;
+    font-size:0.92vw;
+    color:#2a2035;
+  }
+  .kb2 {
+    font-size:0.72vw; color:#3a3048;
+    text-align:center;
+    padding:0.04vw 0;
+    line-height:1.55;
+  }
+  .kb2 b { color:#4a2080; }
+
+  .part {
+    border-left:4px solid;
+    border-radius:0 4px 4px 0;
+    padding:0.14vw 0.25vw;
+  }
+  .part.p1 { border-left-color:#2070b0; background:#e8f0f8; }
+  .part.p2 { border-left-color:#b06800; background:#f8f0e8; }
+  .part.p3 { border-left-color:#7030a0; background:#f0e8f8; }
+
+  .part .lb { font-size:0.82vw; font-weight:700; margin-bottom:0.04vw; color:#1a1028; }
+  .part .tag {
+    display:inline-block; padding:0.02vw 0.18vw;
+    border-radius:3px; font-size:0.68vw; margin-right:0.1vw; font-weight:700;
+  }
+  .part.p1 .tag { background:#c8ddf0; color:#14507a; }
+  .part.p2 .tag { background:#f0dcc0; color:#805000; }
+  .part.p3 .tag { background:#dcc8f0; color:#501890; }
+
+  .part p { font-size:0.72vw; color:#2a2035; line-height:1.65; }
+  .part .ans { font-size:0.82vw; font-weight:900; margin-top:0.04vw; }
+  .part.p1 .ans { color:#14507a; }
+  .part.p2 .ans { color:#805000; }
+  .part.p3 .ans { color:#501890; }
+
+  .rs {
+    background:linear-gradient(135deg,#e8e0f5,#e0e8f0);
+    border:2px solid #b0a8c8;
+    border-radius:0.25vw;
+    padding:0.15vw;
+    text-align:center;
+    margin-top:auto;
+  }
+  .rs .rl { font-size:0.52vw; color:#6a5a7a; font-weight:600; }
+  .rs .rv { font-size:0.88vw; color:#1a1028; font-weight:900; }
+  .rs .rv .v1 { color:#14507a; }
+  .rs .rv .v2 { color:#805000; }
+  .rs .rv .v3 { color:#501890; }
+
+  .ftr {
+    grid-column:1/-1; grid-row:3;
+    text-align:center; font-size:0.42vw; color:#a098b0;
+    padding-top:0.08vw; border-top:1px solid #d0c8dc; margin-top:0.04vw;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="hdr">
+    <h1>그래프 풀이 — <span class="m il">f</span> = (<span class="m il">y</span> − (2<span class="m il">x</span> + 3))<sup>2</sup> + (<span class="m il">y</span> + 2)<sup>2</sup> − 6</h1>
+    <div class="sub">간격 <span class="m il">d</span>일 때 최솟값 = <span class="frac m il"><span class="num"><span class="m">d</span><sup>2</sup></span><span class="den">2</span></span> − 6</div>
+  </div>
+
+  <!-- ══════════════ LEFT: SVG ══════════════ -->
+  <!--
+    좌표계: origin(0,0) → SVG(220, 275), 1 unit = 55px
+    y범위 −5~5 (x축 중앙), x범위 −4~5
+  -->
+  <div class="left">
+    <svg viewBox="-50 -30 595 610" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ax" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <path d="M0,0 L7,2.5 L0,5" fill="#a098b0"/>
+        </marker>
+        <marker id="ay" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <path d="M0,0 L7,2.5 L0,5" fill="#a098b0"/>
+        </marker>
+      </defs>
+
+      <!-- Grid -->
+      <g stroke="#ddd6e6" stroke-width="0.6">
+        <!-- vertical: x = -4 ~ 5 -->
+        <line x1="0" y1="-20" x2="0" y2="560"/>
+        <line x1="55" y1="-20" x2="55" y2="560"/>
+        <line x1="110" y1="-20" x2="110" y2="560"/>
+        <line x1="165" y1="-20" x2="165" y2="560"/>
+        <line x1="275" y1="-20" x2="275" y2="560"/>
+        <line x1="330" y1="-20" x2="330" y2="560"/>
+        <line x1="385" y1="-20" x2="385" y2="560"/>
+        <line x1="440" y1="-20" x2="440" y2="560"/>
+        <line x1="495" y1="-20" x2="495" y2="560"/>
+        <!-- horizontal: y = -5 ~ 5 -->
+        <line x1="-40" y1="0" x2="540" y2="0"/>
+        <line x1="-40" y1="55" x2="540" y2="55"/>
+        <line x1="-40" y1="110" x2="540" y2="110"/>
+        <line x1="-40" y1="165" x2="540" y2="165"/>
+        <line x1="-40" y1="220" x2="540" y2="220"/>
+        <line x1="-40" y1="330" x2="540" y2="330"/>
+        <line x1="-40" y1="385" x2="540" y2="385"/>
+        <line x1="-40" y1="440" x2="540" y2="440"/>
+        <line x1="-40" y1="495" x2="540" y2="495"/>
+        <line x1="-40" y1="550" x2="540" y2="550"/>
+      </g>
+
+      <!-- x≥0 shading -->
+      <rect x="220" y="-20" width="325" height="580" fill="rgba(176,104,0,0.03)" rx="3"/>
+
+      <!-- Axes -->
+      <line x1="-45" y1="275" x2="540" y2="275" stroke="#a098b0" stroke-width="1.6" marker-end="url(#ax)"/>
+      <line x1="220" y1="565" x2="220" y2="-25" stroke="#a098b0" stroke-width="1.6" marker-end="url(#ay)"/>
+      <text x="535" y="295" font-size="15" fill="#6a5a7a" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic">x</text>
+      <text x="205" y="-12" font-size="15" fill="#6a5a7a" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic">y</text>
+
+      <!-- Tick labels: x -->
+      <g font-size="13" fill="#8a7a9a" font-family="'Latin Modern Math','Times New Roman',serif" text-anchor="middle">
+        <text x="0" y="293">−4</text>
+        <text x="55" y="293">−3</text>
+        <text x="110" y="293">−2</text>
+        <text x="165" y="293">−1</text>
+        <text x="275" y="293">1</text>
+        <text x="330" y="293">2</text>
+        <text x="385" y="293">3</text>
+        <text x="440" y="293">4</text>
+        <text x="495" y="293">5</text>
+      </g>
+      <!-- Tick labels: y -->
+      <g font-size="13" fill="#8a7a9a" font-family="'Latin Modern Math','Times New Roman',serif" text-anchor="end">
+        <text x="212" y="335">−1</text>
+        <text x="212" y="390">−2</text>
+        <text x="212" y="445">−3</text>
+        <text x="212" y="500">−4</text>
+        <text x="212" y="555">−5</text>
+        <text x="212" y="225">1</text>
+        <text x="212" y="170">2</text>
+        <text x="212" y="115">3</text>
+        <text x="212" y="60">4</text>
+        <text x="212" y="5">5</text>
+      </g>
+
+      <!-- ═══ Line: y = −2 ═══ -->
+      <!-- y=−2 → SVG_y = 275+110 = 385 -->
+      <line x1="-40" y1="385" x2="540" y2="385" stroke="#c02050" stroke-width="2.5" opacity="0.45"/>
+      <text x="535" y="378" font-size="14" fill="#c02050" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" text-anchor="end" font-weight="700">y = −2</text>
+
+      <!-- ═══ Line: y = 2x+3 ═══ -->
+      <!-- x=−4→y=−5 SVG(0,550), x=1→y=5 SVG(275,0) -->
+      <line x1="0" y1="550" x2="275" y2="0" stroke="#2070b0" stroke-width="2.5" opacity="0.5"/>
+      <text x="283" y="-5" font-size="14" fill="#2070b0" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700">y = 2x + 3</text>
+
+      <!-- ═══ (1) Intersection: (−5/2, −2) → SVG(82.5, 385) ═══ -->
+      <circle cx="82.5" cy="385" r="8" fill="#2070b0" stroke="#f3eff8" stroke-width="2.5"/>
+      <text x="82.5" y="410" font-size="13" fill="#14507a" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700" text-anchor="middle">(−5/2, −2)</text>
+      <text x="82.5" y="425" font-size="11" fill="#14507a" font-family="'Latin Modern Math','Times New Roman',serif" opacity="0.7" text-anchor="middle">d = 0 → f = −6</text>
+
+      <!-- ═══ (2) x=0 ═══ -->
+      <!-- (0,3)→SVG(220,110), (0,−2)→SVG(220,385), midpoint(0,½)→SVG(220,247.5) -->
+      <line x1="220" y1="115" x2="220" y2="380" stroke="#b06800" stroke-width="2" stroke-dasharray="6,4" opacity="0.4"/>
+      <text x="234" y="252" font-size="14" fill="#b06800" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700">5</text>
+      <circle cx="220" cy="110" r="4" fill="#b06800" opacity="0.45"/>
+      <circle cx="220" cy="247.5" r="7.5" fill="#b06800" stroke="#f3eff8" stroke-width="2.5"/>
+      <text x="248" y="243" font-size="13" fill="#805000" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700">(0, 1/2)</text>
+      <text x="248" y="259" font-size="11" fill="#805000" font-family="'Latin Modern Math','Times New Roman',serif" opacity="0.7">d = 5 → f = 13/2</text>
+
+      <!-- ═══ (3) Integer points ═══ -->
+
+      <!-- x=−2: y=−1(line)→SVG(110,330), y=−2→SVG(110,385) -->
+      <line x1="110" y1="333" x2="110" y2="382" stroke="#7030a0" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+      <text x="99" y="361" font-size="13" fill="#7030a0" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" text-anchor="end" font-weight="700">1</text>
+
+      <circle cx="110" cy="330" r="6.5" fill="#7030a0" stroke="#f3eff8" stroke-width="2"/>
+      <text x="125" y="326" font-size="12" fill="#501890" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700">(−2, −1)</text>
+
+      <circle cx="110" cy="385" r="6.5" fill="#7030a0" stroke="#f3eff8" stroke-width="2"/>
+      <text x="125" y="400" font-size="12" fill="#501890" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700">(−2, −2)</text>
+
+      <!-- x=−3: y=−3(line)→SVG(55,440), y=−2→SVG(55,385) -->
+      <line x1="55" y1="388" x2="55" y2="437" stroke="#7030a0" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+      <text x="44" y="416" font-size="13" fill="#7030a0" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" text-anchor="end" font-weight="700">1</text>
+
+      <circle cx="55" cy="385" r="6.5" fill="#7030a0" stroke="#f3eff8" stroke-width="2"/>
+      <text x="-30" y="381" font-size="12" fill="#501890" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700">(−3, −2)</text>
+
+      <circle cx="55" cy="440" r="6.5" fill="#7030a0" stroke="#f3eff8" stroke-width="2"/>
+      <text x="-30" y="455" font-size="12" fill="#501890" font-family="'Latin Modern Math','Times New Roman',serif" font-style="italic" font-weight="700">(−3, −3)</text>
+
+      <text x="55" y="472" font-size="11" fill="#501890" font-family="'Latin Modern Math','Times New Roman',serif" opacity="0.7" text-anchor="middle">d = 1 → f = −5</text>
+
+    </svg>
+  </div>
+
+  <!-- ══════════════ RIGHT: Solution ══════════════ -->
+  <div class="right">
+
+    <div class="kb">
+      <span class="m il">f</span> =
+      <span class="m" style="color:#2070b0">(<span class="m">y</span> − (2<span class="m">x</span> + 3))<sup>2</sup></span>
+      +
+      <span class="m" style="color:#c02050">(<span class="m">y</span> + 2)<sup>2</sup></span>
+      − 6
+    </div>
+
+    <div class="kb2">
+      <b>두 축 <span class="m il">y</span> = 2<span class="m il">x</span> + 3 과 <span class="m il">y</span> = −2 의 간격 <span class="m il">d</span>일 때, <span class="m il">y</span>는 중점에서 최소</b><br>
+      최솟값 = <span class="frac m il"><span class="num"><span class="m">d</span><sup>2</sup></span><span class="den">2</span></span> − 6
+    </div>
+
+    <div class="part p1">
+      <div class="lb"><span class="tag">(1)</span> <span class="m il">x</span>, <span class="m il">y</span> 실수</div>
+      <p>두 축 일치: 2<span class="m il">x</span> + 3 = −2 → <span class="m il">x</span> = −<span class="frac m il"><span class="num">5</span><span class="den">2</span></span>,&ensp;<span class="m il">y</span> = −2</p>
+      <p>간격 <span class="m il">d</span> = 0 → 거리 합 = 0</p>
+      <div class="ans"><span class="m il">f</span>(−<span class="frac m il"><span class="num">5</span><span class="den">2</span></span>, −2) = 0 + 0 − 6 = <strong style="font-size:1.5em">−6</strong></div>
+    </div>
+
+    <div class="part p2">
+      <div class="lb"><span class="tag">(2)</span> <span class="m il">x</span> ≥ 0,&ensp;<span class="m il">y</span> ≥ 0</div>
+      <p><span class="m il">x</span> ≥ 0 이면 축₁ = 2<span class="m il">x</span> + 3 ≥ 3, 축₂ = −2 → <span class="m il">d</span> ≥ 5</p>
+      <p><span class="m il">x</span> = 0 일 때 <span class="m il">d</span> = 5 최소, 중점 <span class="m il">y</span> = <span class="frac m il"><span class="num">1</span><span class="den">2</span></span></p>
+      <div class="ans"><span class="m il">f</span>(0, <span class="frac m il"><span class="num">1</span><span class="den">2</span></span>) = <span class="frac m il"><span class="num">25</span><span class="den">2</span></span> − 6 = <strong style="font-size:1.5em"><span class="frac m"><span class="num">13</span><span class="den">2</span></span></strong></div>
+    </div>
+
+    <div class="part p3">
+      <div class="lb"><span class="tag">(3)</span> <span class="m il">x</span>, <span class="m il">y</span> 정수</div>
+      <p>축₁ = 2<span class="m il">x</span> + 3 (홀수) ≠ −2 → 일치 불가</p>
+      <p><span class="m il">d</span> 최소 = 1 :&ensp;<span class="m il">x</span> = −2 (축₁ = −1) 또는 <span class="m il">x</span> = −3 (축₁ = −3)</p>
+      <p>중점 <span class="m il">y</span> = −<span class="frac m il"><span class="num">3</span><span class="den">2</span></span> (비정수) → 위아래 정수에서 동일</p>
+      <div class="ans">
+        <span class="m il">f</span>(−2, −1) = <span class="m il">f</span>(−2, −2) = <span class="m il">f</span>(−3, −2) = <span class="m il">f</span>(−3, −3) = <strong style="font-size:1.5em">−5</strong>
+      </div>
+    </div>
+
+    <div class="rs">
+      <div class="rl">최솟값 정리</div>
+      <div class="rv">
+        (1) <span class="v1">−6</span> &emsp;
+        (2) <span class="v2"><span class="frac m"><span class="num">13</span><span class="den">2</span></span></span> &emsp;
+        (3) <span class="v3">−5</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ftr">DJN edu | KAIST JUNE</div>
+
+</div>
+</body>
+</html>
