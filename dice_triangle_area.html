@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>좌표 기반 풀이 — 주사위 확률</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Latin+Modern+Math&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; background:#f3eff8; }
+
+  .frame {
+    width:100vw; height:56.25vw;
+    max-height:100vh; max-width:177.78vh;
+    margin:auto; position:absolute; top:0;bottom:0;left:0;right:0;
+    background:#f3eff8;
+    display:grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: auto 1fr auto;
+    font-family:'Noto Serif KR', serif;
+    color:#2a2035;
+    padding: 1.2vw 1.5vw 0.6vw 1.5vw;
+    gap: 0;
+  }
+
+  /* Header */
+  .hdr {
+    grid-column: 1/-1;
+    display:flex; justify-content:space-between; align-items:baseline;
+    border-bottom: 1px solid #d0c8dc;
+    padding-bottom: 0.4vw;
+    margin-bottom: 0.5vw;
+  }
+  .hdr h1 { font-size:1vw; font-weight:900; color:#2a2035; letter-spacing:-0.02em; }
+  .hdr .sub { font-size:0.52vw; color:#8a7a9a; }
+
+  /* Math */
+  .m { font-family:'Latin Modern Math','Times New Roman',serif; font-style:italic; }
+  .m.il { font-size:1.15em; }
+  .frac { display:inline-flex; flex-direction:column; align-items:center; vertical-align:middle; line-height:1.05; }
+  .frac .num { border-bottom:1px solid currentColor; padding:0 0.12em 0.02em; }
+  .frac .den { padding:0.02em 0.12em 0; }
+
+  /* Left: SVG */
+  .left {
+    grid-column:1; grid-row:2;
+    display:flex; flex-direction:column;
+    padding-right:0.8vw;
+  }
+  .left svg { width:100%; height:auto; flex:1; }
+
+  .chart-legend {
+    display:flex; gap:0.8vw; flex-wrap:wrap; margin-top:0.25vw;
+  }
+  .chart-legend .cl {
+    display:flex; align-items:center; gap:0.25vw;
+    font-size:0.42vw; color:#8a7a9a;
+  }
+  .chart-legend .cd { width:0.45vw; height:0.45vw; border-radius:50%; flex-shrink:0; }
+
+  /* Right: Steps */
+  .right {
+    grid-column:2; grid-row:2;
+    display:flex; flex-direction:column;
+    gap:0.35vw;
+    padding-left:0.5vw;
+    border-left:1px solid #d0c8dc;
+    overflow:hidden;
+  }
+
+  .st { display:flex; gap:0.4vw; align-items:flex-start; }
+  .sn {
+    width:1.1vw; height:1.1vw; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.5vw; font-weight:700; flex-shrink:0;
+    margin-top:0.05vw;
+  }
+  .sn.c1 { background:rgba(32,112,176,0.12); color:#1a6090; border:1px solid rgba(32,112,176,0.3); }
+  .sn.c2 { background:rgba(112,48,160,0.12); color:#602088; border:1px solid rgba(112,48,160,0.3); }
+  .sn.c3 { background:rgba(176,104,0,0.12); color:#b06800; border:1px solid rgba(176,104,0,0.3); }
+  .sn.c4 { background:rgba(26,128,80,0.12); color:#1a8050; border:1px solid rgba(26,128,80,0.3); }
+  .sn.c5 { background:rgba(160,133,0,0.12); color:#806a00; border:1px solid rgba(160,133,0,0.3); }
+
+  .sc { flex:1; min-width:0; }
+  .sc .tt { font-size:0.58vw; font-weight:700; color:#2a2035; margin-bottom:0.15vw; }
+  .sc p { font-size:0.46vw; color:#4a3a5a; line-height:1.55; margin-bottom:0.1vw; }
+
+  .fb {
+    background:rgba(0,0,0,0.02);
+    border:1px solid rgba(0,0,0,0.08);
+    border-radius:0.2vw;
+    padding:0.2vw 0.4vw;
+    text-align:center;
+    font-size:0.5vw;
+    margin:0.15vw 0;
+    color:#2a2035;
+  }
+  .fb.cy { border-color:rgba(32,112,176,0.25); }
+
+  /* Mini table */
+  .mt { width:100%; border-collapse:collapse; font-size:0.42vw; margin:0.1vw 0; }
+  .mt th { background:rgba(0,0,0,0.03); padding:0.12vw 0.2vw; color:#8a7a9a; font-weight:600; border-bottom:1px solid #d0c8dc; text-align:center; }
+  .mt td { padding:0.1vw 0.2vw; text-align:center; color:#4a3a5a; border-bottom:1px solid rgba(0,0,0,0.02); }
+  .mt .hl td { background:rgba(112,48,160,0.06); color:#806a00; font-weight:700; }
+
+  /* Orange mini table */
+  .mt .og td { color:#c2410c; font-weight:600; }
+
+  /* Result */
+  .rs {
+    background: linear-gradient(135deg, rgba(112,48,160,0.05), rgba(32,112,176,0.05));
+    border:1px solid rgba(112,48,160,0.2);
+    border-radius:0.3vw;
+    padding:0.3vw;
+    text-align:center;
+    margin-top: auto;
+  }
+  .rs .lb { font-size:0.38vw; color:#8a7a9a; }
+  .rs .an { font-size:1vw; font-weight:900; color:#806a00; font-family:'Latin Modern Math',serif; font-style:italic; }
+
+  /* Footer */
+  .ftr {
+    grid-column:1/-1; grid-row:3;
+    text-align:center;
+    font-size:0.4vw; color:#8a7a9a;
+    padding-top:0.3vw;
+    border-top:1px solid #d0c8dc;
+    margin-top:0.2vw;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <h1>좌표 기반 풀이 — 주사위 삼각형 넓이 조건부 확률</h1>
+    <div class="sub">O → 주사위 3회 → △OP₂P₃ 넓이 ≥ 15일 때 a₃=6일 확률</div>
+  </div>
+
+  <!-- LEFT: Coordinate Plane -->
+  <div class="left">
+    <svg viewBox="-55 -55 790 670" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ax" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="#a090b0"/></marker>
+        <marker id="ay" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="#a090b0"/></marker>
+        <filter id="g"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="rg"><feGaussianBlur stdDeviation="2.5" result="b"/><feFlood flood-color="#dc2626" flood-opacity="0.35" result="c"/><feComposite in="c" in2="b" operator="in" result="r"/><feMerge><feMergeNode in="r"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="og"><feGaussianBlur stdDeviation="2.5" result="b"/><feFlood flood-color="#c2410c" flood-opacity="0.4" result="c"/><feComposite in="c" in2="b" operator="in" result="r"/><feMerge><feMergeNode in="r"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Grid -->
+      <g stroke="#ddd6e6" stroke-width="0.5">
+        <line x1="60" y1="-30" x2="60" y2="580"/><line x1="120" y1="-30" x2="120" y2="580"/>
+        <line x1="180" y1="-30" x2="180" y2="580"/><line x1="240" y1="-30" x2="240" y2="580"/>
+        <line x1="300" y1="-30" x2="300" y2="580"/><line x1="360" y1="-30" x2="360" y2="580"/>
+        <line x1="420" y1="-30" x2="420" y2="580"/><line x1="480" y1="-30" x2="480" y2="580"/>
+        <line x1="540" y1="-30" x2="540" y2="580"/><line x1="600" y1="-30" x2="600" y2="580"/>
+        <line x1="660" y1="-30" x2="660" y2="580"/><line x1="720" y1="-30" x2="720" y2="580"/>
+        <line x1="0" y1="520" x2="730" y2="520"/><line x1="0" y1="460" x2="730" y2="460"/>
+        <line x1="0" y1="400" x2="730" y2="400"/><line x1="0" y1="340" x2="730" y2="340"/>
+        <line x1="0" y1="280" x2="730" y2="280"/><line x1="0" y1="220" x2="730" y2="220"/>
+        <line x1="0" y1="160" x2="730" y2="160"/><line x1="0" y1="100" x2="730" y2="100"/>
+        <line x1="0" y1="40" x2="730" y2="40"/><line x1="0" y1="-20" x2="730" y2="-20"/>
+      </g>
+
+      <!-- Threshold regions -->
+      <rect x="-3" y="-48" width="375" height="330" fill="rgba(176,104,0,0.06)" rx="3" stroke="rgba(176,104,0,0.15)" stroke-width="0.8" stroke-dasharray="5,3"/>
+      <text x="365" y="-36" font-size="9" fill="rgba(176,104,0,0.7)" font-family="Noto Serif KR" text-anchor="end" font-weight="600">y₂ ≥ 5</text>
+
+      <rect x="353" y="-48" width="382" height="643" fill="rgba(220,38,38,0.04)" rx="3" stroke="rgba(220,38,38,0.12)" stroke-width="0.8" stroke-dasharray="5,3"/>
+      <text x="728" y="-36" font-size="9" fill="rgba(220,38,38,0.6)" font-family="Noto Serif KR" text-anchor="end">x₂ ≥ 6</text>
+
+      <!-- Axes -->
+      <line x1="-8" y1="580" x2="735" y2="580" stroke="#a090b0" stroke-width="1.2" marker-end="url(#ax)"/>
+      <line x1="0" y1="592" x2="0" y2="-42" stroke="#a090b0" stroke-width="1.2" marker-end="url(#ay)"/>
+      <text x="730" y="600" font-size="11" fill="#6a5a7a" font-family="Latin Modern Math" font-style="italic">x</text>
+      <text x="-12" y="-34" font-size="11" fill="#6a5a7a" font-family="Latin Modern Math" font-style="italic">y</text>
+
+      <!-- Tick labels -->
+      <g font-size="9" fill="#a090b0" font-family="Latin Modern Math" text-anchor="middle">
+        <text x="120" y="598">2</text><text x="240" y="598">4</text><text x="360" y="598">6</text>
+        <text x="480" y="598">8</text><text x="600" y="598">10</text><text x="720" y="598">12</text>
+      </g>
+      <g font-size="9" fill="#a090b0" font-family="Latin Modern Math" text-anchor="end">
+        <text x="-6" y="523">1</text><text x="-6" y="463">2</text><text x="-6" y="403">3</text>
+        <text x="-6" y="343">4</text><text x="-6" y="283">5</text><text x="-6" y="223">6</text>
+        <text x="-6" y="163">7</text><text x="-6" y="103">8</text><text x="-6" y="43">9</text>
+        <text x="-6" y="-17">10</text>
+      </g>
+
+      <!-- DIM: non-candidate points -->
+      <g opacity="0.2">
+        <circle cx="240" cy="580" r="4.5" fill="#2563eb"/>
+        <circle cx="0" cy="460" r="4.5" fill="#db2777"/>
+        <circle cx="0" cy="340" r="4.5" fill="#db2777"/>
+        <circle cx="120" cy="520" r="4.5" fill="#7c3aed"/>
+        <circle cx="240" cy="520" r="4.5" fill="#7c3aed"/>
+        <circle cx="120" cy="400" r="4.5" fill="#7c3aed"/>
+        <circle cx="240" cy="400" r="4.5" fill="#7c3aed"/>
+      </g>
+
+      <!-- RED RING candidates (x₂≥6) with →N -->
+      <circle cx="360" cy="580" r="6" fill="#2563eb" opacity="0.85" filter="url(#g)"/>
+      <circle cx="360" cy="580" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <text x="378" y="584" font-size="9.5" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→1</text>
+
+      <circle cx="480" cy="580" r="7" fill="#2563eb" opacity="0.85" filter="url(#g)"/>
+      <circle cx="480" cy="580" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <text x="498" y="584" font-size="9.5" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→1</text>
+
+      <circle cx="600" cy="580" r="6" fill="#2563eb" opacity="0.85" filter="url(#g)"/>
+      <circle cx="600" cy="580" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <text x="618" y="584" font-size="9.5" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→2</text>
+
+      <circle cx="720" cy="580" r="5" fill="#2563eb" opacity="0.85" filter="url(#g)"/>
+      <circle cx="720" cy="580" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <text x="715" y="568" font-size="9.5" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→2</text>
+
+      <!-- RED + ORANGE double ring (y₂≥5, x₂<6): y-axis -->
+      <circle cx="0" cy="220" r="7" fill="#db2777" opacity="0.85" filter="url(#g)"/>
+      <circle cx="0" cy="220" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <circle cx="0" cy="220" r="19" fill="none" stroke="#c2410c" stroke-width="2" filter="url(#og)"/>
+      <text x="26" y="214" font-size="9" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→1</text>
+      <text x="26" y="226" font-size="8" fill="#c2410c" font-family="Noto Serif KR" font-weight="600">⑥</text>
+
+      <circle cx="0" cy="100" r="6" fill="#db2777" opacity="0.85" filter="url(#g)"/>
+      <circle cx="0" cy="100" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <circle cx="0" cy="100" r="19" fill="none" stroke="#c2410c" stroke-width="2" filter="url(#og)"/>
+      <text x="26" y="94" font-size="9" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→2</text>
+      <text x="26" y="106" font-size="8" fill="#c2410c" font-family="Noto Serif KR" font-weight="600">⑥</text>
+
+      <circle cx="0" cy="-20" r="5" fill="#db2777" opacity="0.85" filter="url(#g)"/>
+      <circle cx="0" cy="-20" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <circle cx="0" cy="-20" r="19" fill="none" stroke="#c2410c" stroke-width="2" filter="url(#og)"/>
+      <text x="26" y="-26" font-size="9" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→2</text>
+      <text x="26" y="-14" font-size="8" fill="#c2410c" font-family="Noto Serif KR" font-weight="600">⑥</text>
+
+      <!-- RED + ORANGE: interior y=5 row -->
+      <circle cx="120" cy="280" r="6" fill="#7c3aed" opacity="0.85" filter="url(#g)"/>
+      <circle cx="120" cy="280" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <circle cx="120" cy="280" r="19" fill="none" stroke="#c2410c" stroke-width="2" filter="url(#og)"/>
+      <text x="96" y="268" font-size="9" fill="#dc2626" font-family="Latin Modern Math" text-anchor="end" font-weight="700">→1</text>
+      <text x="144" y="280" font-size="8" fill="#c2410c" font-family="Noto Serif KR" font-weight="600">⑥</text>
+
+      <circle cx="240" cy="280" r="6" fill="#7c3aed" opacity="0.85" filter="url(#g)"/>
+      <circle cx="240" cy="280" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <circle cx="240" cy="280" r="19" fill="none" stroke="#c2410c" stroke-width="2" filter="url(#og)"/>
+      <text x="216" y="268" font-size="9" fill="#dc2626" font-family="Latin Modern Math" text-anchor="end" font-weight="700">→1</text>
+      <text x="264" y="280" font-size="8" fill="#c2410c" font-family="Noto Serif KR" font-weight="600">⑥</text>
+
+      <!-- (6,5): both directions! RED →2 + ORANGE -->
+      <circle cx="360" cy="280" r="6" fill="#7c3aed" opacity="0.85" filter="url(#g)"/>
+      <circle cx="360" cy="280" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <circle cx="360" cy="280" r="19" fill="none" stroke="#c2410c" stroke-width="2" filter="url(#og)"/>
+      <text x="384" y="274" font-size="9" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→2</text>
+      <text x="384" y="286" font-size="8" fill="#c2410c" font-family="Noto Serif KR" font-weight="600">⑤⑥</text>
+
+      <!-- RED only: x=6 column, y<5 -->
+      <circle cx="360" cy="520" r="6" fill="#7c3aed" opacity="0.85" filter="url(#g)"/>
+      <circle cx="360" cy="520" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <text x="378" y="524" font-size="9.5" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→1</text>
+
+      <circle cx="360" cy="400" r="6" fill="#7c3aed" opacity="0.85" filter="url(#g)"/>
+      <circle cx="360" cy="400" r="13" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3.5,2" filter="url(#rg)"/>
+      <text x="378" y="404" font-size="9.5" fill="#dc2626" font-family="Latin Modern Math" font-weight="700">→1</text>
+
+      <!-- Origin -->
+      <circle cx="0" cy="580" r="6" fill="#a08500" stroke="#806a00" stroke-width="1.5"/>
+      <text x="-11" y="577" font-size="10" fill="#a08500" font-family="Latin Modern Math" font-style="italic" text-anchor="end" font-weight="700">O</text>
+    </svg>
+
+    <div class="chart-legend">
+      <div class="cl"><div class="cd" style="background:#3b82f6"></div>짝+짝</div>
+      <div class="cl"><div class="cd" style="background:#ec4899"></div>홀+홀</div>
+      <div class="cl"><div class="cd" style="background:#a855f7"></div>혼합</div>
+      <div class="cl"><div class="cd" style="border:1.5px dashed #ef4444;background:none"></div>S≥15 후보</div>
+      <div class="cl"><div class="cd" style="border:2px solid #f97316;background:none"></div>a₃=6 해당</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Solution Steps -->
+  <div class="right">
+
+    <!-- Step 1 -->
+    <div class="st">
+      <div class="sn c1">1</div>
+      <div class="sc">
+        <div class="tt">넓이 공식</div>
+        <div class="fb cy">
+          <span class="m">a₃</span> 짝수 → <span class="m">S</span> = <span class="frac m"><span class="num">a₃ · y₂</span><span class="den">2</span></span>
+          &nbsp;/&nbsp;
+          <span class="m">a₃</span> 홀수 → <span class="m">S</span> = <span class="frac m"><span class="num">a₃ · x₂</span><span class="den">2</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="st">
+      <div class="sn c2">2</div>
+      <div class="sc">
+        <div class="tt">P₂ 전체 나열 → 19개 점</div>
+        <p>x축 5점, y축 5점, 내부 9점 (좌측 좌표평면)</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="st">
+      <div class="sn c3">3</div>
+      <div class="sc">
+        <div class="tt">S ≥ 15 필터링 → <span style="color:#ef4444">빨간 동그라미</span> 13개</div>
+        <p><span class="m il">a₃</span>·(반대좌표) ≥ 30. 반대좌표 ≥ 5 필요 (<span class="m il">a₃ ≤ 6</span>이므로)</p>
+        <p style="color:#ef4444; font-size:0.42vw;">각 점 옆 →N = 가능한 a₃ 개수</p>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="st">
+      <div class="sn c4">4</div>
+      <div class="sc">
+        <div class="tt">도달 경우 × →N = 합산</div>
+        <table class="mt">
+          <tr><th>P₂</th><th>도달</th><th>×N</th><th>=</th><th>P₂</th><th>도달</th><th>×N</th><th>=</th></tr>
+          <tr>
+            <td><span class="m">(6,0)</span></td><td>2</td><td>1</td><td>2</td>
+            <td><span class="m">(2,5)</span></td><td>2</td><td>1</td><td>2</td>
+          </tr>
+          <tr>
+            <td><span class="m">(8,0)</span></td><td>3</td><td>1</td><td>3</td>
+            <td><span class="m">(4,5)</span></td><td>2</td><td>1</td><td>2</td>
+          </tr>
+          <tr>
+            <td><span class="m">(10,0)</span></td><td>2</td><td>2</td><td>4</td>
+            <td><span class="m">(6,5)</span></td><td>2</td><td>2</td><td>4</td>
+          </tr>
+          <tr>
+            <td><span class="m">(12,0)</span></td><td>1</td><td>2</td><td>2</td>
+            <td><span class="m">(6,1)</span></td><td>2</td><td>1</td><td>2</td>
+          </tr>
+          <tr>
+            <td><span class="m">(0,6)</span></td><td>3</td><td>1</td><td>3</td>
+            <td><span class="m">(6,3)</span></td><td>2</td><td>1</td><td>2</td>
+          </tr>
+          <tr>
+            <td><span class="m">(0,8)</span></td><td>2</td><td>2</td><td>4</td>
+            <td></td><td></td><td></td><td></td>
+          </tr>
+          <tr>
+            <td><span class="m">(0,10)</span></td><td>1</td><td>2</td><td>2</td>
+            <td></td><td></td><td></td><td></td>
+          </tr>
+          <tr class="hl"><td colspan="4" style="text-align:right">소계: 20</td><td colspan="4" style="text-align:right">소계: 12 → <strong style="font-size:1.1em">합계 32</strong></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="st">
+      <div class="sn c5">5</div>
+      <div class="sc">
+        <div class="tt">a₃ = 6 추출 → <span style="color:#c2410c">주황 동그라미</span> 6개</div>
+        <p><span class="m il">a₃=6</span>(짝수)이므로 <span class="m il">y₂ ≥ 5</span>인 점만 해당</p>
+        <table class="mt">
+          <tr><th>P₂</th><th>(0,6)</th><th>(0,8)</th><th>(0,10)</th><th>(2,5)</th><th>(4,5)</th><th>(6,5)</th><th>합</th></tr>
+          <tr class="og"><td>도달</td><td>3</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td style="color:#806a00;font-weight:900">12</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="rs">
+      <div class="lb">조건부 확률</div>
+      <div class="an">
+        P(a₃=6 | S ≥ 15) = <span class="frac" style="font-size:inherit"><span class="num">12</span><span class="den">32</span></span> = <span class="frac" style="font-size:inherit"><span class="num">3</span><span class="den">8</span></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="ftr">DJN edu | KAIST JUNE</div>
+
+</div>
+</body>
+</html>
